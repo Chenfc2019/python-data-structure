@@ -371,7 +371,7 @@ class DoubleLinkedList(object):
 
     def find(self, data):
         """ 查找节点是否存在"""
-        return data in self.datas()
+        return data in self.items()
 
     def print_list(self):
         '''打印链表数据'''
@@ -842,7 +842,7 @@ if __name__ == '__main__':
 哈希表的文章：[https://zhuanlan.zhihu.com/p/34587466](https://zhuanlan.zhihu.com/p/34587466)
 <a name="EN40m"></a>
 ## 树形结构
-树是一种非线性的层次型数据结构，存储的是具有“一对多”关系的元素的集合。是以边相连的结点的集合，每个结点存储对应的值，当存在子结点时与之相连。<br />相关概念：
+树是一种非线性的层次型数据结构，存储的是具有“一对多”关系的元素的集合。是以边相连的结点的集合，每个结点存储对应的值，当存在子结点时与之相连。<br />树分有为有序树和无序树，有序树的任意节点的子节点之间有顺序关系，无序树则没有，有称为自由树。<br />相关概念：
 
 - 根节点：树的第一个节点
 - 边：树的节点与节点之间通过边相连。
@@ -851,8 +851,294 @@ if __name__ == '__main__':
 - 结点深度：是指对应结点到根结点路径长度。
 <a name="qe1yo"></a>
 ### 二叉树
-二叉树是特殊的树，它的每个节点最多只有两个子节点，称为左孩子和右孩子。
-<a name="g7SXI"></a>
+二叉树是特殊的树，它的每个节点最多只有两个子节点，称为左孩子和右孩子。<br />二叉树的特点：
+
+1. 每个节点最多有两颗子树
+1. 左右子树是有序的，不能颠倒。
+1. 即使只有一颗子树也要区分左右。
+1. 度为0的节点数等于度为2的节点数加1。
+
+二叉树的遍历:<br />遍历表达法有4种方法：先序遍历、中序遍历、后序遍历、层次遍历。<br />先序遍历：又称先根遍历，根-左-右。<br />中序遍历：又称中根遍历，左-根-右，仅二叉树有中序遍历。<br />后序遍历：又称后根遍历，左-右-根。<br />层次遍历：每一层逐一遍历（同广度优先搜索）。<br />![image.png](https://cdn.nlark.com/yuque/0/2020/png/2727521/1607394388473-50c6b920-fe85-4642-8484-4f802fad5118.png#align=left&display=inline&height=383&margin=%5Bobject%20Object%5D&name=image.png&originHeight=766&originWidth=951&size=60667&status=done&style=none&width=476)<br />二叉树的实现
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File  : binarytree.py
+# @Author: Small-orange
+# @Date  : 2020-12-07
+# @Desc  : 二叉树实现
+
+class Node(object):
+    """节点"""
+    def __init__(self,data):
+        self.data = data
+        self.left_child = None
+        self.right_child = None
+
+class BinaryTree(object):
+    """二叉树"""
+
+    def __init__(self):
+        self.root = None
+
+    def add(self,data):
+        """插入节点"""
+        node = Node(data)
+        if self.root is None:
+            self.root = node
+            return
+        # 使用列表构造队列，并将根节点放到队列中
+        queue = [self.root]
+        # 队列不为空时循环
+        while queue:
+            # 取队列头部节点作为当前处理节点
+            cur_node = queue.pop(0)
+            # 左孩子为空时直接放在左孩子位置
+            if cur_node.left_child is None:
+                cur_node.left_child = node
+                return
+            # 不为空时将左孩子放进队列等待处理
+            else:
+                queue.append(cur_node.left_child)
+            # 右孩子逻辑相同
+            if cur_node.right_child is None:
+                cur_node.right_child = node
+                return
+            else:
+                queue.append(cur_node.right_child)
+
+    def breadth_travel(self):
+        """层次遍历"""
+        if self.root is None:
+            return
+        # 使用列表构造层次遍历的队列
+        queue = [self.root]
+        while queue:
+            # 取队列头部节点作为当前处理节点
+            cur_node = queue.pop(0)
+            # 打印节点数据
+            print(cur_node.data,end="   ")
+            # 左孩子非空时将左孩子放入队列
+            if cur_node.left_child is not None:
+                queue.append(cur_node.left_child)
+            # 右孩子非空时将左孩子放入队列
+            if cur_node.right_child is not None:
+                queue.append(cur_node.right_child)
+
+    def preorder(self,root):
+        """先序遍历--根、左、右"""
+        if root is None:
+            return
+        print(root.data,end="   ")
+        self.preorder(root.left_child)
+        self.preorder(root.right_child)
+
+    def inorder(self,root):
+        """中序遍历--左、根、右"""
+        if root is None:
+            return
+        self.inorder(root.left_child)
+        print(root.data, end="   ")
+        self.inorder(root.right_child)
+
+    def postrder(self,root):
+        """后序遍历--左、右、根"""
+        if root is None:
+            return
+        self.postrder(root.left_child)
+        self.postrder(root.right_child)
+        print(root.data, end="   ")
+
+
+if __name__ == '__main__':
+    tree = BinaryTree()
+    tree.add(1)
+    tree.add(2)
+    tree.add(3)
+    tree.add(4)
+    tree.add(5)
+    tree.add(6)
+    tree.add(7)
+    tree.add(8)
+    tree.add(9)
+
+    print('--层次遍历--')
+    tree.breadth_travel()
+
+    print('\n--前序遍历--')
+    tree.preorder(tree.root)
+
+    print('\n--中序遍历--')
+    tree.inorder(tree.root)
+
+    print('\n--后序遍历--')
+    tree.postrder(tree.root)
+```
+遍历结果：
+> --层次遍历--
+> 1   2   3   4   5   6   7   8   9    
+> --前序遍历--
+> 1   2   4   8   9   5   3   6   7    
+> --中序遍历--
+> 8   4   9   2   5   1   6   3   7    
+> --后序遍历--
+> 8   9   4   5   2   6   7   3   1
+
+<a name="1ZM41"></a>
+### 二叉查找树
+一棵二叉查找树是一棵二叉树，其中每个节点的值都大于它的左子树上的任意节点的值，并且小于右子树上任意节点的键。<br />![image.png](https://cdn.nlark.com/yuque/0/2020/png/2727521/1607483177633-6d3b002b-ed8f-451f-88f9-c2d4dfe31084.png#align=left&display=inline&height=376&margin=%5Bobject%20Object%5D&name=image.png&originHeight=752&originWidth=1330&size=76120&status=done&style=none&width=665)<br />中序遍历结果：15  21  23  30  40  45  50  56<br />二叉平衡树是有序的，中序遍历结果是从小到大的，所以查找的效率较高。<br />**查询节点**<br />从根节点开始查找，待查找的值是否与根节点的值相同，若相同则返回True；否则，判断待寻找的值是否比根节点的值小，若是则进入根节点左子树进行查找，否则进入右子树进行查找。<br />**插入节点**<br />从根节点开始，若插入的值比根节点的值小，则将其插入根节点的左子树；若比根节点的值大，则将其插入根节点的右子树。<br />**查询最大值**<br />从根节点开始，沿着右子树一直往下，直到找到最后一个右子树节点。<br />**查找最小值**<br />从根节点开始，沿着左子树一直往下，直到找到最后一个左子树节点。<br />删除节点：<br />删除节点分为3中情况：
+
+1. 待删除节点既无左子树也无右子树：直接删除该节点即可。
+1. 待删除节点只有左子树或者只有右子树：将其左子树或右子树根节点代替待删除节点。
+1. 待删除节点既有左子树也有右子树：找到该节点右子树中最小值节点，使用该节点代替待删除节点，然后在右子树中删除最小值节点。
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File  : binary_search_tree.py
+# @Author: Small-orange
+# @Date  : 2020-12-09
+# @Desc  : 二叉查找树实现
+
+class Node(object):
+    """节点"""
+    def __init__(self,data):
+        self.data = data
+        self.left_child = None
+        self.right_child = None
+
+class BinarySearchTree(object):
+    """二叉查找树"""
+    def __init__(self):
+        self.root = None
+
+    def find(self,root,data):
+        """查找数据"""
+        if root is None:
+            return False
+        # 比根节点小，往左子树走
+        if data < root.data:
+            return self.find(root.left_child,data)
+        # 比根节点大，往右子树走
+        elif data > root.data :
+            return self.find(root.right_child,data)
+        # 相等时找到
+        else:
+            return True
+
+    def insert_rec(self,root,data):
+        """添加节点-递归实现"""
+        # 左子树为空时插入
+        if root is None:
+            root =  Node(data)
+        # 比根节点小，往左子树走
+        elif data < root.data:
+            root.left_child = self.insert_rec(root.left_child,data)
+        # 比根节点大，往右子树走
+        elif data > root.data:
+                root.right_child = self.insert_rec(root.right_child,data)
+        return root
+
+    def min(self,root):
+        """最小值"""
+        if root.left_child:
+            return self.min(root.left_child)
+        else:
+            return root
+
+    def max(self,root):
+        """最大值"""
+        if root.right_child:
+            return search_tree.max(root.right_child)
+        else:
+            return root
+
+    def inorder(self,root):
+        """中序遍历--左、根、右"""
+        if root is None:
+            return
+        self.inorder(root.left_child)
+        print(root.data, end="   ")
+        self.inorder(root.right_child)
+
+    def delNode(self, root, data):
+        """删除二叉搜索树中值为val的点"""
+        if root == None:
+            return
+        if data < root.data:
+            root.left_child = self.delNode(root.left_child, data)
+        elif data > root.data:
+            root.right_child = self.delNode(root.right_child, data)
+        # 当val == root.val时，分为三种情况：只有左子树或者只有右子树、有左右子树、即无左子树又无右子树
+        else:
+            if root.left_child and root.right_child:
+                # 既有左子树又有右子树，则需找到右子树中最小值节点
+                temp = self.min(root.right_child)
+                root.data = temp.data
+                # 再把右子树中最小值节点删除
+                root.right_child = self.delNode(root.right_child, temp.data)
+            elif root.right_child == None and root.left_child == None:
+                # 左右子树都为空
+                root = None
+            elif root.right_child == None:
+                # 只有左子树
+                root = root.left_child
+            elif root.left_child == None:
+                # 只有右子树
+                root = root.right_child
+        return root
+
+
+if __name__ == '__main__':
+    node1 = Node(40)
+    node2 = Node(30)
+    node3 = Node(21)
+    node4 = Node(35)
+    node5 = Node(50)
+    node1.left_child = node2
+    node1.right_child = node5
+    node2.left_child = node3
+    node2.right_child = node4
+
+    search_tree = BinarySearchTree()
+    search_tree.root = node1
+
+    search_tree.insert_rec(search_tree.root,45)
+    search_tree.insert_rec(search_tree.root, 15)
+    print('初始树：')
+    search_tree.inorder(search_tree.root)
+    print()
+    print('最大值：',search_tree.max(search_tree.root).data)
+    print('最小值：', search_tree.min(search_tree.root).data)
+
+    print('删除叶子节点15')
+    search_tree.delNode(search_tree.root,15)
+    search_tree.inorder(search_tree.root)
+    print()
+
+    print('删除一个子树的节点50')
+    search_tree.delNode(search_tree.root,50)
+    search_tree.inorder(search_tree.root)
+    print()
+
+    print('删除两个子树的节点30')
+    search_tree.delNode(search_tree.root,30)
+    search_tree.inorder(search_tree.root)
+    print()
+
+```
+输出结果：
+> 初始树：
+> 15   21   30   35   40   45   50    
+> 最大值： 50
+> 最小值： 15
+> 删除叶子节点15
+> 21   30   35   40   45   50    
+> 删除一个子树的节点50
+> 21   30   35   40   45    
+> 删除两个子树的节点30
+> 21   35   40   45
+
+参考博客：[https://www.cnblogs.com/lliuye/p/9118591.html](https://www.cnblogs.com/lliuye/p/9118591.html)
+<a name="F33TV"></a>
 ### AVL树
 <a name="jcRk8"></a>
 ### 红黑树
